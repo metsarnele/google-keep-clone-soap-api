@@ -1,0 +1,777 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Google Keep Clone API (Eesti)",
+    "version": "1.0.0",
+    "description": "RESTful API, mis jäljendab Google Keep'i põhifunktsionaalsust, võimaldades kasutajatel luua, uuendada, kustutada ja vaadata märkmeid koos siltide ja meeldetuletustega. Toetab kasutajate autentimist ja seansihaldust."
+  },
+  "servers": [
+    {
+      "url": "/",
+      "description": "Eesti Dokumentatsioon"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Users",
+      "description": "Kasutajate haldamise toimingud"
+    },
+    {
+      "name": "Sessions",
+      "description": "Autentimise toimingud"
+    },
+    {
+      "name": "Notes",
+      "description": "Märkmete haldamise toimingud"
+    },
+    {
+      "name": "Tags",
+      "description": "Siltide haldamise toimingud"
+    }
+  ],
+  "paths": {
+    "/users": {
+      "post": {
+        "summary": "Registreeri uus kasutaja",
+        "tags": [
+          "Users"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              },
+              "example": {
+                "username": "kasutajanimi",
+                "password": "parool123"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Kasutaja edukalt registreeritud",
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Loodud kasutaja URL"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Kasutaja edukalt registreeritud"
+                    },
+                    "user": {
+                      "$ref": "#/components/schemas/User"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Vigased andmed päringus"
+          },
+          "409": {
+            "description": "Kasutaja on juba olemas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Kasutaja on juba olemas"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Serveri sisemine viga",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/{id}": {
+      "patch": {
+        "summary": "Uuenda kasutaja andmeid",
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserUpdate"
+              },
+              "example": {
+                "username": "uuskasutajanimi",
+                "password": "uusparool123"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Kasutaja andmed edukalt uuendatud"
+          },
+          "401": {
+            "description": "Juurdepääs keelatud: Token puudub või on vigane"
+          },
+          "404": {
+            "description": "Kasutajat ei leitud"
+          },
+          "500": {
+            "description": "Serveri sisemine viga",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Kustuta kasutaja",
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Kasutaja edukalt kustutatud"
+          },
+          "401": {
+            "description": "Juurdepääs keelatud: Token puudub või on vigane"
+          },
+          "404": {
+            "description": "Kasutajat ei leitud"
+          },
+          "500": {
+            "description": "Serveri sisemine viga",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sessions": {
+      "post": {
+        "summary": "Kasutaja sisselogimine",
+        "tags": [
+          "Sessions"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              },
+              "example": {
+                "username": "kasutajanimi",
+                "password": "parool123"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "JWT token tagastatud",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string",
+                      "description": "JWT autentimise token"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Vigased sisselogimisandmed"
+          },
+          "500": {
+            "description": "Serveri sisemine viga",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Kasutaja väljalogimine",
+        "tags": [
+          "Sessions"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Kasutaja edukalt välja logitud"
+          },
+          "401": {
+            "description": "Juurdepääs keelatud: Token puudub või on vigane"
+          },
+          "500": {
+            "description": "Serveri sisemine viga",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/notes": {
+      "get": {
+        "summary": "Kuva kõik märkmed",
+        "tags": [
+          "Notes"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Märkmed edukalt tagastatud",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Note"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Juurdepääs keelatud: Token puudub või on vigane"
+          },
+          "500": {
+            "description": "Serveri sisemine viga",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Loo uus märge",
+        "tags": [
+          "Notes"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Note"
+              },
+              "example": {
+                "title": "Märkme pealkiri",
+                "content": "Märkme sisu",
+                "tags": [
+                  "töö",
+                  "ideed"
+                ],
+                "reminder": "2025-03-15T10:00:00Z"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Märge edukalt loodud",
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Loodud märkme URL"
+              }
+            }
+          },
+          "400": {
+            "description": "Vigased andmed päringus"
+          },
+          "401": {
+            "description": "Juurdepääs keelatud: Token puudub või on vigane"
+          },
+          "500": {
+            "description": "Serveri sisemine viga",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/notes/{id}": {
+      "patch": {
+        "summary": "Uuenda märget",
+        "tags": [
+          "Notes"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Note"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Märge edukalt uuendatud"
+          },
+          "401": {
+            "description": "Juurdepääs keelatud: Token puudub või on vigane"
+          },
+          "404": {
+            "description": "Märget ei leitud"
+          },
+          "500": {
+            "description": "Serveri sisemine viga",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Kustuta märge",
+        "tags": [
+          "Notes"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Märge edukalt kustutatud"
+          },
+          "401": {
+            "description": "Juurdepääs keelatud: Token puudub või on vigane"
+          },
+          "404": {
+            "description": "Märget ei leitud"
+          },
+          "500": {
+            "description": "Serveri sisemine viga",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tags": {
+      "get": {
+        "summary": "Kuva kõik sildid",
+        "tags": [
+          "Tags"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sildid edukalt tagastatud",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Tag"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Juurdepääs keelatud: Token puudub või on vigane"
+          },
+          "500": {
+            "description": "Serveri sisemine viga",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Loo uus silt",
+        "tags": [
+          "Tags"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Tag"
+              },
+              "example": {
+                "name": "töö"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Silt edukalt loodud"
+          },
+          "400": {
+            "description": "Vigased andmed päringus"
+          },
+          "401": {
+            "description": "Juurdepääs keelatud: Token puudub või on vigane"
+          },
+          "500": {
+            "description": "Serveri sisemine viga",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tags/{id}": {
+      "patch": {
+        "summary": "Uuenda silti",
+        "tags": [
+          "Tags"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Tag"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Silt edukalt uuendatud"
+          },
+          "401": {
+            "description": "Juurdepääs keelatud: Token puudub või on vigane"
+          },
+          "404": {
+            "description": "Silti ei leitud"
+          },
+          "500": {
+            "description": "Serveri sisemine viga",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Kustuta silt",
+        "tags": [
+          "Tags"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Silt edukalt kustutatud"
+          },
+          "401": {
+            "description": "Juurdepääs keelatud: Token puudub või on vigane"
+          },
+          "404": {
+            "description": "Silti ei leitud"
+          },
+          "500": {
+            "description": "Serveri sisemine viga",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ServerError": {
+        "type": "object",
+        "description": "Serveri vea vastuse formaat",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Veateade",
+            "example": "Serveri sisemine viga"
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "required": [
+          "username",
+          "password"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Kasutaja unikaalne identifikaator"
+          },
+          "username": {
+            "type": "string",
+            "description": "Kasutajanimi"
+          },
+          "password": {
+            "type": "string",
+            "description": "Kasutaja parool"
+          }
+        }
+      },
+      "UserUpdate": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "description": "Uus kasutajanimi"
+          },
+          "password": {
+            "type": "string",
+            "description": "Uus parool"
+          }
+        }
+      },
+      "Note": {
+        "type": "object",
+        "required": [
+          "title",
+          "content"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Märkme unikaalne identifikaator"
+          },
+          "title": {
+            "type": "string",
+            "description": "Märkme pealkiri"
+          },
+          "content": {
+            "type": "string",
+            "description": "Märkme sisu"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Märkmega seotud sildid"
+          },
+          "reminder": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Meeldetuletus (ISO 8601 formaat)"
+          }
+        }
+      },
+      "Tag": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Sildi unikaalne identifikaator"
+          },
+          "name": {
+            "type": "string",
+            "description": "Sildi nimi"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "JWT autentimistoken. Lisa päise 'Authorization' väärtuseks 'Bearer <token>'"
+      }
+    }
+  }
+}

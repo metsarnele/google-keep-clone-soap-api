@@ -1,0 +1,16 @@
+node_modules/
+.idea/
+.env
+
+
+# Data files
+data/
+*.json
+!package.json
+!package-lock.json
+!openapi.json
+!openapi.et.json
+
+# Temporary files
+start-dev.js
+nginx.conf
