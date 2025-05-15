@@ -6,8 +6,11 @@
   "type": "module",
   "scripts": {
     "start": "node server.js",
+    "start:soap": "node src/soap-server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
+    "test:soap": "bash tests/test.sh",
     "dev": "nodemon server.js",
+    "dev:soap": "nodemon src/soap-server.js",
     "start:dev": "NODE_ENV=development node server.js"
   },
   "keywords": [],
@@ -20,6 +23,7 @@
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
     "nodemon": "^3.1.9",
+    "soap": "^1.0.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
     "uuid": "^11.0.5"

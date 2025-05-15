@@ -1,0 +1,570 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions name="GoogleKeepService"
+             targetNamespace="http://keep.soap.api/wsdl"
+             xmlns="http://schemas.xmlsoap.org/wsdl/"
+             xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+             xmlns:tns="http://keep.soap.api/wsdl"
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+             xmlns:types="http://keep.soap.api/types">
+
+  <!-- Import XSD types -->
+  <types>
+    <xsd:schema targetNamespace="http://keep.soap.api/types">
+      <!-- User related types -->
+      <xsd:element name="User">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="id" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="username" type="xsd:string"/>
+            <xsd:element name="password" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="UserResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="id" type="xsd:string"/>
+            <xsd:element name="username" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="UserUpdate">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="username" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="password" type="xsd:string" minOccurs="0"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <!-- Session related types -->
+      <xsd:element name="Credentials">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="username" type="xsd:string"/>
+            <xsd:element name="password" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="SessionResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="token" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <!-- Note related types -->
+      <xsd:element name="Note">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="id" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="title" type="xsd:string"/>
+            <xsd:element name="content" type="xsd:string"/>
+            <xsd:element name="tags" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element name="reminder" type="xsd:dateTime" minOccurs="0"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="NoteResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="id" type="xsd:string"/>
+            <xsd:element name="title" type="xsd:string"/>
+            <xsd:element name="content" type="xsd:string"/>
+            <xsd:element name="tags" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element name="reminder" type="xsd:dateTime" minOccurs="0"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="NoteUpdate">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="title" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="content" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="tags" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element name="reminder" type="xsd:dateTime" minOccurs="0"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="NotesResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="notes" type="types:NoteType" minOccurs="0" maxOccurs="unbounded"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:complexType name="NoteType">
+        <xsd:sequence>
+          <xsd:element name="id" type="xsd:string"/>
+          <xsd:element name="title" type="xsd:string"/>
+          <xsd:element name="content" type="xsd:string"/>
+          <xsd:element name="tags" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+          <xsd:element name="reminder" type="xsd:dateTime" minOccurs="0"/>
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <!-- Tag related types -->
+      <xsd:element name="Tag">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="id" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="name" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="TagResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="id" type="xsd:string"/>
+            <xsd:element name="name" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="TagUpdate">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="name" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="TagsResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="tags" type="types:TagType" minOccurs="0" maxOccurs="unbounded"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:complexType name="TagType">
+        <xsd:sequence>
+          <xsd:element name="id" type="xsd:string"/>
+          <xsd:element name="name" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <!-- Common types -->
+      <xsd:element name="IdRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="id" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="AuthHeader">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="token" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="StatusResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="message" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="ErrorResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="message" type="xsd:string"/>
+            <xsd:element name="code" type="xsd:int"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+  </types>
+
+  <!-- Messages for User operations -->
+  <message name="RegisterUserRequest">
+    <part name="user" element="types:User"/>
+  </message>
+  <message name="RegisterUserResponse">
+    <part name="response" element="types:UserResponse"/>
+  </message>
+
+  <message name="UpdateUserRequest">
+    <part name="id" element="types:IdRequest"/>
+    <part name="update" element="types:UserUpdate"/>
+  </message>
+  <message name="UpdateUserResponse">
+    <part name="response" element="types:StatusResponse"/>
+  </message>
+
+  <message name="DeleteUserRequest">
+    <part name="id" element="types:IdRequest"/>
+  </message>
+  <message name="DeleteUserResponse">
+    <part name="response" element="types:StatusResponse"/>
+  </message>
+
+  <!-- Messages for Session operations -->
+  <message name="LoginRequest">
+    <part name="credentials" element="types:Credentials"/>
+  </message>
+  <message name="LoginResponse">
+    <part name="response" element="types:SessionResponse"/>
+  </message>
+
+  <message name="LogoutRequest">
+    <part name="auth" element="types:AuthHeader"/>
+  </message>
+  <message name="LogoutResponse">
+    <part name="response" element="types:StatusResponse"/>
+  </message>
+
+  <!-- Messages for Note operations -->
+  <message name="GetNotesRequest">
+    <part name="auth" element="types:AuthHeader"/>
+  </message>
+  <message name="GetNotesResponse">
+    <part name="response" element="types:NotesResponse"/>
+  </message>
+
+  <message name="CreateNoteRequest">
+    <part name="auth" element="types:AuthHeader"/>
+    <part name="note" element="types:Note"/>
+  </message>
+  <message name="CreateNoteResponse">
+    <part name="response" element="types:NoteResponse"/>
+  </message>
+
+  <message name="UpdateNoteRequest">
+    <part name="auth" element="types:AuthHeader"/>
+    <part name="id" element="types:IdRequest"/>
+    <part name="update" element="types:NoteUpdate"/>
+  </message>
+  <message name="UpdateNoteResponse">
+    <part name="response" element="types:StatusResponse"/>
+  </message>
+
+  <message name="DeleteNoteRequest">
+    <part name="auth" element="types:AuthHeader"/>
+    <part name="id" element="types:IdRequest"/>
+  </message>
+  <message name="DeleteNoteResponse">
+    <part name="response" element="types:StatusResponse"/>
+  </message>
+
+  <!-- Messages for Tag operations -->
+  <message name="GetTagsRequest">
+    <part name="auth" element="types:AuthHeader"/>
+  </message>
+  <message name="GetTagsResponse">
+    <part name="response" element="types:TagsResponse"/>
+  </message>
+
+  <message name="CreateTagRequest">
+    <part name="auth" element="types:AuthHeader"/>
+    <part name="tag" element="types:Tag"/>
+  </message>
+  <message name="CreateTagResponse">
+    <part name="response" element="types:TagResponse"/>
+  </message>
+
+  <message name="UpdateTagRequest">
+    <part name="auth" element="types:AuthHeader"/>
+    <part name="id" element="types:IdRequest"/>
+    <part name="update" element="types:TagUpdate"/>
+  </message>
+  <message name="UpdateTagResponse">
+    <part name="response" element="types:StatusResponse"/>
+  </message>
+
+  <message name="DeleteTagRequest">
+    <part name="auth" element="types:AuthHeader"/>
+    <part name="id" element="types:IdRequest"/>
+  </message>
+  <message name="DeleteTagResponse">
+    <part name="response" element="types:StatusResponse"/>
+  </message>
+
+  <!-- Error message -->
+  <message name="FaultMessage">
+    <part name="fault" element="types:ErrorResponse"/>
+  </message>
+
+  <!-- Port Type (Interface) -->
+  <portType name="GoogleKeepPortType">
+    <!-- User operations -->
+    <operation name="RegisterUser">
+      <input message="tns:RegisterUserRequest"/>
+      <output message="tns:RegisterUserResponse"/>
+      <fault name="fault" message="tns:FaultMessage"/>
+    </operation>
+
+    <operation name="UpdateUser">
+      <input message="tns:UpdateUserRequest"/>
+      <output message="tns:UpdateUserResponse"/>
+      <fault name="fault" message="tns:FaultMessage"/>
+    </operation>
+
+    <operation name="DeleteUser">
+      <input message="tns:DeleteUserRequest"/>
+      <output message="tns:DeleteUserResponse"/>
+      <fault name="fault" message="tns:FaultMessage"/>
+    </operation>
+
+    <!-- Session operations -->
+    <operation name="Login">
+      <input message="tns:LoginRequest"/>
+      <output message="tns:LoginResponse"/>
+      <fault name="fault" message="tns:FaultMessage"/>
+    </operation>
+
+    <operation name="Logout">
+      <input message="tns:LogoutRequest"/>
+      <output message="tns:LogoutResponse"/>
+      <fault name="fault" message="tns:FaultMessage"/>
+    </operation>
+
+    <!-- Note operations -->
+    <operation name="GetNotes">
+      <input message="tns:GetNotesRequest"/>
+      <output message="tns:GetNotesResponse"/>
+      <fault name="fault" message="tns:FaultMessage"/>
+    </operation>
+
+    <operation name="CreateNote">
+      <input message="tns:CreateNoteRequest"/>
+      <output message="tns:CreateNoteResponse"/>
+      <fault name="fault" message="tns:FaultMessage"/>
+    </operation>
+
+    <operation name="UpdateNote">
+      <input message="tns:UpdateNoteRequest"/>
+      <output message="tns:UpdateNoteResponse"/>
+      <fault name="fault" message="tns:FaultMessage"/>
+    </operation>
+
+    <operation name="DeleteNote">
+      <input message="tns:DeleteNoteRequest"/>
+      <output message="tns:DeleteNoteResponse"/>
+      <fault name="fault" message="tns:FaultMessage"/>
+    </operation>
+
+    <!-- Tag operations -->
+    <operation name="GetTags">
+      <input message="tns:GetTagsRequest"/>
+      <output message="tns:GetTagsResponse"/>
+      <fault name="fault" message="tns:FaultMessage"/>
+    </operation>
+
+    <operation name="CreateTag">
+      <input message="tns:CreateTagRequest"/>
+      <output message="tns:CreateTagResponse"/>
+      <fault name="fault" message="tns:FaultMessage"/>
+    </operation>
+
+    <operation name="UpdateTag">
+      <input message="tns:UpdateTagRequest"/>
+      <output message="tns:UpdateTagResponse"/>
+      <fault name="fault" message="tns:FaultMessage"/>
+    </operation>
+
+    <operation name="DeleteTag">
+      <input message="tns:DeleteTagRequest"/>
+      <output message="tns:DeleteTagResponse"/>
+      <fault name="fault" message="tns:FaultMessage"/>
+    </operation>
+  </portType>
+
+  <!-- Binding -->
+  <binding name="GoogleKeepBinding" type="tns:GoogleKeepPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+
+    <!-- User operations bindings -->
+    <operation name="RegisterUser">
+      <soap:operation soapAction="http://keep.soap.api/RegisterUser"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </fault>
+    </operation>
+
+    <operation name="UpdateUser">
+      <soap:operation soapAction="http://keep.soap.api/UpdateUser"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </fault>
+    </operation>
+
+    <operation name="DeleteUser">
+      <soap:operation soapAction="http://keep.soap.api/DeleteUser"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </fault>
+    </operation>
+
+    <!-- Session operations bindings -->
+    <operation name="Login">
+      <soap:operation soapAction="http://keep.soap.api/Login"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </fault>
+    </operation>
+
+    <operation name="Logout">
+      <soap:operation soapAction="http://keep.soap.api/Logout"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </fault>
+    </operation>
+
+    <!-- Note operations bindings -->
+    <operation name="GetNotes">
+      <soap:operation soapAction="http://keep.soap.api/GetNotes"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </fault>
+    </operation>
+
+    <operation name="CreateNote">
+      <soap:operation soapAction="http://keep.soap.api/CreateNote"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </fault>
+    </operation>
+
+    <operation name="UpdateNote">
+      <soap:operation soapAction="http://keep.soap.api/UpdateNote"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </fault>
+    </operation>
+
+    <operation name="DeleteNote">
+      <soap:operation soapAction="http://keep.soap.api/DeleteNote"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </fault>
+    </operation>
+
+    <!-- Tag operations bindings -->
+    <operation name="GetTags">
+      <soap:operation soapAction="http://keep.soap.api/GetTags"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </fault>
+    </operation>
+
+    <operation name="CreateTag">
+      <soap:operation soapAction="http://keep.soap.api/CreateTag"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </fault>
+    </operation>
+
+    <operation name="UpdateTag">
+      <soap:operation soapAction="http://keep.soap.api/UpdateTag"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </fault>
+    </operation>
+
+    <operation name="DeleteTag">
+      <soap:operation soapAction="http://keep.soap.api/DeleteTag"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </fault>
+    </operation>
+  </binding>
+
+  <!-- Service -->
+  <service name="GoogleKeepService">
+    <port name="GoogleKeepPort" binding="tns:GoogleKeepBinding">
+      <soap:address location="http://localhost:8001/soap"/>
+    </port>
+  </service>
+</definitions>
