@@ -96,6 +96,26 @@ bash tests/test.sh
 
 This script will run a series of tests to verify that all SOAP operations are working correctly.
 
+### Comparing REST and SOAP APIs
+
+To verify the functional equivalence between the REST and SOAP APIs, you can run the comparison tests:
+
+```sh
+# Make the scripts executable
+chmod +x scripts/run-comparison-tests.sh tests/compare-apis.sh
+
+# Run the comparison tests
+bash scripts/run-comparison-tests.sh
+```
+
+This script will:
+1. Start both REST and SOAP servers
+2. Run a series of tests against both APIs
+3. Compare the results to verify functional equivalence
+4. Stop the servers after testing
+
+The tests verify that both APIs provide the same functionality for user management, authentication, notes, and tags operations.
+
 ### Using the SOAP Client
 
 A sample SOAP client is provided in the `client` directory. You can run it using:
