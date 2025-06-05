@@ -8,21 +8,28 @@ Ensure you have the following installed on your system:
 - [Node.js](https://nodejs.org/) (v14 or later)
 - [npm](https://www.npmjs.com/) (comes with Node.js)
 
-## Building the Application
+## Quick Setup
 
-This is a Node.js application, so building simply requires installing dependencies:
-
-```sh
-npm install
-```
-
-If you're using a different package manager like Yarn, you can use:
+We provide a setup script that automates the installation process:
 
 ```sh
-yarn install
+# Make the setup script executable
+chmod +x scripts/setup.sh
+
+# Run the setup script
+bash scripts/setup.sh
 ```
 
-## Installation
+The setup script will:
+1. Verify Node.js is installed (v14 or later)
+2. Install all dependencies
+3. Create a `.env` file with a secure random secret key
+4. Set up the data directory
+5. Make all scripts executable
+
+### Manual Installation
+
+If you prefer to install manually:
 
 1. **Install dependencies**
    ```sh
@@ -63,17 +70,13 @@ The SOAP endpoint will be available at:
 
 ## API Documentation
 
-### SOAP API
 The SOAP API is defined in the WSDL file located at `wsdl/google-keep-soap.wsdl`. This file describes all available operations, message formats, and data types.
 
-The SOAP API is documented through its WSDL file:
-   ```
-   http://localhost:8001/wsdl
-   ```
+When the server is running, the WSDL is available at: `http://localhost:8001/wsdl`
 
-## SOAP API Implementation
+### Features
 
-The SOAP API provides the same functionality as the REST API but using SOAP protocol. It includes:
+This API provides the following functionality:
 
 - User management (register, update, delete)
 - Authentication (login, logout)
@@ -85,6 +88,8 @@ The SOAP API provides the same functionality as the REST API but using SOAP prot
 While this implementation uses Node.js, the SOAP protocol is language-agnostic. The WSDL file (`wsdl/google-keep-soap.wsdl`) defines the service contract and can be used with any programming language that supports SOAP.
 
 To implement a client in another language, use the WSDL file to generate client code using your preferred SOAP toolkit.
+
+## Testing
 
 ### Testing the SOAP API
 
@@ -101,10 +106,6 @@ This script will run a series of tests to verify that all SOAP operations are wo
 To verify the functional equivalence between the REST and SOAP APIs, you can run the comparison tests:
 
 ```sh
-# Make the scripts executable
-chmod +x scripts/run-comparison-tests.sh tests/compare-apis.sh
-
-# Run the comparison tests
 bash scripts/run-comparison-tests.sh
 ```
 
@@ -114,21 +115,31 @@ This script will:
 3. Compare the results to verify functional equivalence
 4. Stop the servers after testing
 
-The tests verify that both APIs provide the same functionality for user management, authentication, notes, and tags operations.
+### Common Issues and Solutions
 
-### Using the SOAP Client
+If you encounter any issues running the tests, check these common solutions:
 
-A sample SOAP client is provided in the `client` directory. You can run it using:
+1. **Port conflicts**: If ports 3000 or 8001 are already in use, you can modify the port numbers in the `.env` file.
+
+2. **Missing dependencies**: Run `npm install` to ensure all dependencies are installed.
+
+3. **Permission issues**: Make sure all scripts are executable with `chmod +x scripts/*.sh tests/*.sh`.
+
+4. **Data persistence**: If tests are failing due to existing data, you can clear the data directory with `rm -rf data/*.json` before running tests.
+
+5. **Token extraction issues**: If the login test is failing, ensure you're using the latest version of the test script which properly extracts tokens from both REST and SOAP responses.
+
+## Client Examples
+
+### Using the Provided Client
+
+A sample SOAP client is provided in the `client` directory:
 
 ```sh
 node client/example.js
 ```
 
-This interactive client allows you to test all SOAP operations from the command line.
-
-### Alternative Client Examples
-
-#### Using curl (Command Line)
+### Using curl
 
 ```sh
 curl -X POST http://localhost:8001/soap \
@@ -136,9 +147,9 @@ curl -X POST http://localhost:8001/soap \
   -d '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:wsdl="http://keep.soap.api/wsdl" xmlns:typ="http://keep.soap.api/types"><soapenv:Header/><soapenv:Body><wsdl:LoginRequest><typ:credentials><typ:username>testuser</typ:username><typ:password>password123</typ:password></typ:credentials></wsdl:LoginRequest></soapenv:Body></soapenv:Envelope>'
 ```
 
-#### Using Other Languages
+### Using Other Languages
 
-You can use any programming language that supports SOAP to interact with this API. Here are some examples:
+You can use any programming language that supports SOAP to interact with this API:
 
 **Python (using zeep):**
 ```python
@@ -146,20 +157,13 @@ from zeep import Client
 
 client = Client('http://localhost:8001/wsdl')
 result = client.service.Login(credentials={'username': 'testuser', 'password': 'password123'})
-print(result)
 ```
 
 **Java (using JAX-WS):**
 ```java
-import javax.xml.namespace.QName;
-import jakarta.xml.ws.Service;
-
 URL wsdlURL = new URL("http://localhost:8001/wsdl");
 QName qname = new QName("http://keep.soap.api/wsdl", "GoogleKeepService");
 Service service = Service.create(wsdlURL, qname);
 GoogleKeepPortType port = service.getPort(GoogleKeepPortType.class);
-
-// Call operations
-SessionResponse response = port.login(credentials);
 ```
 

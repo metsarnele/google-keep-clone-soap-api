@@ -104,7 +104,14 @@ extract_rest_value() {
     echo "$value"
   else
     # Fallback to grep and sed if jq is not available
+    # First try with quotes (for string values)
     local value=$(echo "$response" | grep -o "\"$key\":\"[^\"]*\"" | sed "s/\"$key\":\"//;s/\"//")
+    
+    # If not found, try without quotes (for non-string values or different JSON format)
+    if [ -z "$value" ]; then
+      value=$(echo "$response" | grep -o "\"$key\":[^,}]*" | sed "s/\"$key\"://")
+    fi
+    
     echo "$value"
   fi
 }
